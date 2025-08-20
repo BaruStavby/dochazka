@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Docházka</title>
+</head>
+<body>
+  <h1>Docházka</h1>
+  <button onclick="odhlasit()">Odhlásit</button><br><br>
+  <label>Zaměstnanec:
+    <select id="jmeno">
+      <option>Jan Novák</option>
+      <option>Karel Dvořák</option>
+      <option>Eva Malá</option>
+      <option>Petr Velký</option>
+      <option>Lucie Horáková</option>
+      <option>Martin Černý</option>
+      <option>Alena Bílá</option>
+    </select>
+  </label><br><br>
+
+  <button onclick="zaznam('start')">Start</button>
+  <button onclick="zaznam('stop')">Stop</button>
+  <button onclick="stahnoutExport()">⬇️ Export do Excelu</button>
+
+  <p id="vysledek"></p>
+
+  <h2>📋 Docházka</h2>
+  <label>Filtr datum: <input type="date" id="datum"></label>
+  <label>Hledat jméno: <input type="text" id="hledat"></label>
+  <button onclick="nactiTabulku()">🔍 Filtrovat</button>
+
+  <table border="1" id="tabulka">
+    <thead>
+      <tr>
+        <th>Datum</th>
+        <th>Čas</th>
+        <th>Jméno</th>
+        <th>Akce</th>
+        <th>Mistr</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>📊 Souhrn pracovní doby</h2>
+</body>
+</html>
