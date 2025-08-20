@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head><meta charset="UTF-8"><title>Docházka</title></head>
+<body>
+    <h1>Docházka</h1>
+    <button onclick="odhlasit()">Odhlásit</button><br><br>
+    <label>Zaměstnanec:
+        <select id="jmeno">
+            <option>Jan Novák</option><option>Karel Dvořák</option><option>Eva Malá</option><option>Petr Velký</option><option>Lucie Horáková</option><option>Martin Černý</option><option>Alena Bílá</option><option>Tomáš Zelený</option><option>Anna Modrá</option><option>Josef Fialový</option><option>Ivan Buletsa starší</option><option>Ivan Buletsa Mladší</option><option>Korol Vladik</option>
+        </select>
+    </label><br><br>
+    <button onclick="zaznam('start')">Start</button>
+    <button onclick="zaznam('stop')">Stop</button>
+    <button onclick="stahnoutExport()">📥 Export do Excelu</button>
+    <p id="vysledek"></p>
+
+    <h2>📋 Docházka</h2>
+    <label>Filtr datum: <input type="date" id="datum"></label>
+    <label>Hledat jméno: <input type="text" id="hledat"></label>
+    <button onclick="nactiTabulku()">🔍 Filtrovat</button>
+    <table border="1" id="tabulka">
+        <thead><tr><th>Datum</th><th>Čas</th><th>Jméno</th><th>Akce</th><th>Mistr</th></tr></thead>
+        <tbody></tbody>
+    </table>
+
+    <h2>🕓 Souhrn pracovní doby</h2>
+    <button onclick="nactiSouhrn()">📊 Zobraz souhrn</button>
+    <table border="1" id="souhrn">
+        <thead><tr><th>Zaměstnanec</th><th>Odpracováno (hod)</th></tr></thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        function zaznam(akce) {
+            const jmeno = document.getElementById("jmeno").value;
+            fetch("/zaznam", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({jmeno, akce})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    document.getElementById("vysledek").innerText = `Záznam uložen: ${data.zaznam.join(" | ")}`;
+                    nactiTabulku();
+                } else {
+                    document.getElementById("vysledek").innerText = "Chyba: " + data.message;
+                }
+            });
+        }
+
+        function nactiTabulku() {
+            const datum = document.getElementById("datum").value;
+            const hledat = document.getElementById("hledat").value;
+            let url = "/data?";
+            if (datum) url += `datum=${datum}&`;
+            if (hledat) url += `hledat=${hledat}`;
+
+            fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector("#tabulka tbody");
+                tbody.innerHTML = "";
+                data.forEach(z => {
+                    const row = `<tr><td>${z.datum}</td><td>${z.cas}</td><td>${z.jmeno}</td><td>${z.akce}</td><td>${z.mistr}</td></tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+        }
+
+        function nactiSouhrn() {
+            fetch("/souhrn")
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector("#souhrn tbody");
+                tbody.innerHTML = "";
+                data.forEach(z => {
+                    const row = `<tr><td>${z.jmeno}</td><td>${z.hodin}</td></tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+        }
+
+        function stahnoutExport() {
+            window.location.href = "/export";
+        }
+
+        function odhlasit() {
+            window.location.href = "/logout";
+        }
+
+        window.onload = nactiTabulku;
+    </script>
+</body>
+</html>
